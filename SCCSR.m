@@ -2,18 +2,18 @@
 	This file is part of ios-csr.
 	Copyright (C) 2013-14 Ales Teska
 
-    ios-csr is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	ios-csr is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    ios-csr is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	ios-csr is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with ios-csr.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License
+	along with ios-csr.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #import "SCCSR.h"
@@ -73,18 +73,18 @@ static uint8_t SET_tag = 0x31;
 	CC_SHA1_Update(&SHA1, [CertificationRequestInfo mutableBytes], (unsigned int)[CertificationRequestInfo length]);
 	unsigned char digest[CC_SHA1_DIGEST_LENGTH];
 	CC_SHA1_Final(digest, &SHA1);
-    
+	
 	// Build signature - step 2: Sign hash
-    uint8_t signature[256];
-    size_t signature_len = sizeof(signature);
-    OSStatus osrc = SecKeyRawSign(
+	uint8_t signature[256];
+	size_t signature_len = sizeof(signature);
+	OSStatus osrc = SecKeyRawSign(
 		privateKey,
 		kSecPaddingPKCS1SHA1,
 		digest, sizeof(digest),
 		signature, &signature_len
-    );
+	);
 	assert(osrc == noErr);
-    
+	
 	NSMutableData * CertificationRequest = [[NSMutableData alloc] initWithCapacity:1024];
 	[CertificationRequest appendData:CertificationRequestInfo];
 	[CertificationRequest appendBytes:SEQUENCE_OBJECT_sha1WithRSAEncryption length:sizeof(SEQUENCE_OBJECT_sha1WithRSAEncryption)];
@@ -244,50 +244,50 @@ static uint8_t SET_tag = 0x31;
 
 + (NSData *)getPublicKeyExp:(NSData *)publicKeyBits
 {
-    int iterator = 0;
+	int iterator = 0;
 	
-    iterator++; // TYPE - bit stream - mod + exp
-    [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator]; // Total size
+	iterator++; // TYPE - bit stream - mod + exp
+	[SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator]; // Total size
 	
-    iterator++; // TYPE - bit stream mod
-    int mod_size = [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator];
-    iterator += mod_size;
+	iterator++; // TYPE - bit stream mod
+	int mod_size = [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator];
+	iterator += mod_size;
 	
-    iterator++; // TYPE - bit stream exp
-    int exp_size = [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator];
+	iterator++; // TYPE - bit stream exp
+	int exp_size = [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator];
 	
-    return [publicKeyBits subdataWithRange:NSMakeRange(iterator, exp_size)];
+	return [publicKeyBits subdataWithRange:NSMakeRange(iterator, exp_size)];
 }
 
 +(NSData *)getPublicKeyMod:(NSData *)publicKeyBits
 {
-    int iterator = 0;
+	int iterator = 0;
 	
-    iterator++; // TYPE - bit stream - mod + exp
-    [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator]; // Total size
+	iterator++; // TYPE - bit stream - mod + exp
+	[SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator]; // Total size
 	
-    iterator++; // TYPE - bit stream mod
-    int mod_size = [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator];
+	iterator++; // TYPE - bit stream mod
+	int mod_size = [SCCSR derEncodingGetSizeFrom:publicKeyBits at:&iterator];
 	
-    return [publicKeyBits subdataWithRange:NSMakeRange(iterator, mod_size)];
+	return [publicKeyBits subdataWithRange:NSMakeRange(iterator, mod_size)];
 }
 
 +(int)derEncodingGetSizeFrom:(NSData*)buf at:(int*)iterator
 {
-    const uint8_t* data = [buf bytes];
-    int itr = *iterator;
-    int num_bytes = 1;
-    int ret = 0;
+	const uint8_t* data = [buf bytes];
+	int itr = *iterator;
+	int num_bytes = 1;
+	int ret = 0;
 	
-    if (data[itr] > 0x80) {
-        num_bytes = data[itr] - 0x80;
-        itr++;
-    }
+	if (data[itr] > 0x80) {
+		num_bytes = data[itr] - 0x80;
+		itr++;
+	}
 	
-    for (int i = 0 ; i < num_bytes; i++) ret = (ret * 0x100) + data[itr + i];
+	for (int i = 0 ; i < num_bytes; i++) ret = (ret * 0x100) + data[itr + i];
 	
-    *iterator = itr + num_bytes;
-    return ret;
+	*iterator = itr + num_bytes;
+	return ret;
 }
 
 @end
