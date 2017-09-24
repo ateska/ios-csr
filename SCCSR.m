@@ -25,6 +25,7 @@ Certification Request Syntax Specification: http://www.ietf.org/rfc/rfc2986.txt
 
 */
 
+// Use e.g., https://misc.daniel-marschall.de/asn.1/oid-converter/online.php to convert OID (OBJECT IDENTIFIER) to ASN.1 DER hex forms
 static uint8_t OBJECT_commonName[5] = {0x06, 0x03, 0x55, 0x04, 0x03};
 static uint8_t OBJECT_countryName[5] = {0x06, 0x03, 0x55, 0x04, 0x06};
 static uint8_t OBJECT_organizationName[5] = {0x06, 0x03, 0x55, 0x04, 0x0A};
